@@ -15,16 +15,27 @@ class AdminController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $admins = Admin::with('roles')->select('*')->get();
+        $input = $request->all();
+        $search = $input['search']??null;
 
-        // echo "<pre>";
-        // print_r($admins->toArray());
-        // exit();
+        $admins = Admin::query()->with('roles')->select('*');
+        $this->applySearch($admins, $search );
+        $admins = $admins->get();
 
         return Inertia::render('Admin/index', compact('admins'));
     }
+
+    protected function applySearch($query, $search){
+        return $query->when($search, function($query, $searchTerm) {
+            $query->where(function ($q) use ($searchTerm)  {
+                $q->orWhere('name', 'like', '%' . $searchTerm . '%');
+                $q->orWhere('email', 'like', '%' . $searchTerm . '%');
+            });
+        });
+    }
+
 
     public function getroles()
     {
@@ -52,13 +63,23 @@ class AdminController extends Controller
         $request->validate([
             'name' => 'required|string',
             'email' => 'required|email',
-            'password' => 'required|',
             'roles' => 'array|min:1', // 👈 make sure this matches
         ]);
-        $admin = new Admin();
+        if($request->password && !empty($input['id'])){
+            $request->validate([
+                'password' => 'required',
+            ]);
+        }
+
+        if (!empty($input["id"])) {
+            $admin = Admin::find($input['id']);
+        }else {
+            $admin = new Admin();
+        }
+
         $admin->name = $input['name'];
         $admin->email = $input['email'];
-        $admin->password = Hash::make($input['email']);
+        $admin->password = Hash::make($input['password']);
         $admin->save();
 
         $admin->syncRoles($input['roles']);

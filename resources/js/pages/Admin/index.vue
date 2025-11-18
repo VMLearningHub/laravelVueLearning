@@ -106,7 +106,7 @@
 
 <script setup lang="ts">
 // Vue & Inertia imports
-import { ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { Head, Link, router } from '@inertiajs/vue3'
 
 // Layouts & Components
@@ -141,7 +141,7 @@ import CreateModel from './CreateModel.vue'
 const show = ref(false)
 const selectedAdmin = ref()
 
-const setShow = (admin: any) => {
+const setShow = (admin: Admin) => {
     if (!admin) {
         show.value = false
         return
@@ -178,10 +178,29 @@ const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Admin', href: '/admin' },
 ]
 
+// --- Computed URL ---
+const filterUrl = computed(() => {
+    const url = new URL('/admins', window.location.origin)
+    if (search.value) url.searchParams.set('search', search.value)
+    return url.toString()
+})
+
+// --- Watchers ---
+watch(filterUrl, (updatedUrl) => {
+    show.value = false
+    router.visit(updatedUrl, {
+        preserveScroll: true,
+        preserveState: true,
+        replace: true,
+    })
+})
+
+
 // --- Methods ---
 const handleDeleteAdmin = (id: number): void => {
     if (confirm('Do you want to delete this admin?')) {
         router.delete(`/admins/${id}`)
     }
 }
+
 </script>
