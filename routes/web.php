@@ -37,6 +37,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::delete('/{id}', [AdminController::class, 'destroy'])->name('destroy');
         Route::delete('/deactive/{id}', [AdminController::class, 'destroy'])->name('destroy');
         Route::put('/{id}/edit', [AdminController::class, 'edit'])->name('edit');
+        Route::get('/roles', [AdminController::class, 'getroles'])->name('getroles');
     });
 
     Route::resource('roles', RoleController::class);

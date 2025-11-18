@@ -16,7 +16,7 @@
                         <Link href="/admins/create">Create</Link>
                     </Button> -->
 
-                    <Button type="button" variant="outline" @click=setShow()>
+                    <Button type="button" variant="outline" @click="setShow({})">
                         <!-- <Link href="/admins/create">Create</Link> -->
                         Create
                     </Button>

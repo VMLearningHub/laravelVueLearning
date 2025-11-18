@@ -26,6 +26,13 @@ class AdminController extends Controller
         return Inertia::render('Admin/index', compact('admins'));
     }
 
+    public function getroles()
+    {
+        $roles = Role::select('id', 'name')->get();
+
+        return response()->json($roles);
+    }
+
     /**
      * Show the form for creating a new resource.
      */
