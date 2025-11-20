@@ -8,6 +8,7 @@ use App\Models\PntfToken;
 use App\Models\Report;
 use App\Models\User;
 use App\Models\UserActionNotes;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -21,7 +22,12 @@ class UserController extends Controller
     public function index(Request $request)
     {
         $input = $request->all();
+        $status = $input['tabbing']??null;
         $search = $input['search']??null;
+
+        // echo "<pre>";
+        // print_r($input);
+        // exit();
 
         $users_lists = User::query()->select(
             'users.id',
@@ -43,15 +49,34 @@ class UserController extends Controller
             'users.deleted_by_id',
             'users.user_level',
         )->orderBy('id','desc');
+        if ($status == 'inside') {
+            $users_lists = $users_lists ->where('nominated_by_id', '!=', null)
+            ->whereNotIn('status', ['Deactivated', 'deleted'])->where('deletedAt', null);
+         }elseif($status == 'outside'){
+            $users_lists = $users_lists->where('nominated_by_id', null);
+         }elseif($status == 'deactivated'){
+            $users_lists = $users_lists->where('status', 'deactivated');
+         }elseif($status == 'deleted'){
+            $users_lists = $users_lists->where('status', 'deleted');
+         }elseif($status == 'highlighted'){
+            $users_lists = $users_lists ->where('nominated_by_id', '!=', null)
+            ->where('status', '!=', "Deactivated")
+            ->where('status', '!=', "deleted")
+            ->where('isHighlighted','1')
+            ->where('deletedAt', null);
+         }elseif($status == 'nominated_by_currently'){
+            $users_lists = $users_lists
+            ->withTrashed()
+            ->where(function ($q) {
+                $q->where('nominated_by_id', 1);
+                $q->OrwhereNull('nominated_by_id');
+            });
+        }
 
         $this->applySearch($users_lists, $search );
-        $users_lists = $users_lists->selectRaw('(SELECT SUM(user_sessions.difference) FROM user_sessions WHERE user_sessions.userId = users.id) AS totalSeconds')
-        ->selectRaw('(SELECT COUNT(*) FROM activities WHERE users.id = activities.userId) AS totle_activite_count')
-        ->selectRaw('(SELECT COUNT(*) FROM activities WHERE users.id = activities.userId AND activities.deletedAt IS NOT NULL AND activities.deleted_by_user_type = "admin" ) AS totle_deleted_admin_activite_count')
-        ->selectRaw('(SELECT COUNT(*) FROM activities WHERE users.id = activities.userId AND activities.deletedAt IS NOT NULL AND activities.deleted_by_user_type = "user" ) AS totle_deleted_user_activite_count')
-        ->selectRaw('(SELECT COUNT(*) FROM users AS laravel_reserved_0 WHERE users.id = laravel_reserved_0.nominated_by_id) AS totle_nominated_by_id_count');
 
          $users_lists = $users_lists->paginate(30);
+        //  $users_lists = $users_lists->simplePaginate(30);
 
         // echo "<pre>";
         // print_r($users_lists->toArray());
@@ -61,7 +86,7 @@ class UserController extends Controller
     }
 
     protected function applySearch($query, $search){
-        $searchTerm = str_replace(' ', '%', $search);
+
         return $query->when($search, function($query, $searchTerm){
             $query->where(function ($q) use ($searchTerm)  {
                 $q->orWhere('phone_number', 'like', '%' . $searchTerm . '%');
@@ -72,6 +97,35 @@ class UserController extends Controller
         });
     }
 
+     public function countUserData() {
+
+        $startDate = $this->startDate?? Carbon::now()->startOfDay()->subHour(5)->subMinutes(30);
+        $endDate = $this->endDate?? Carbon::now();
+
+        $userDataCount = DB::table('users')
+            ->selectRaw('COUNT(*) as total_user')
+            ->selectRaw('SUM(status = "deactivated") as deactivated_user')
+            ->selectRaw('SUM(status = "deleted") as deleted_user')
+            // ->selectRaw('SUM(status = "inactive") as inactive_user')
+            ->selectRaw('SUM(CASE WHEN nominated_by_id = 1 OR nominated_by_id IS NULL THEN 1 ELSE 0 END) AS totalNominatedby')
+            ->selectRaw('SUM(nominated_by_id IS NOT NULL AND status != "deactivated" AND deletedAt IS NULL) as active_user')
+            ->selectRaw('SUM(nominated_by_id IS NULL AND status = "active") as waiting_user')
+            ->selectRaw('SUM(nominated_by_id IS NOT NULL AND status != "deactivated" AND status != "deleted" AND deletedAt IS NULL AND isHighlighted = 1) as highlighted_user')
+            // ->selectRaw('SUM(deletedAt IS NOT NULL) as deletedAt_user')
+
+            ->selectRaw('SUM(createdAt BETWEEN ? AND ?) as today_user', [$startDate, $endDate])
+            ->selectRaw('SUM(nominated_by_id IS NULL AND createdAt BETWEEN ? AND ?) as todayWaitingUser', [$startDate, $endDate])
+            ->selectRaw('SUM(nominated_by_id IS NOT NULL AND status != "deactivated" AND deletedAt IS NULL AND createdAt BETWEEN ? AND ?) as todayActiveUser', [$startDate, $endDate])
+            ->selectRaw('SUM(status = "deactivated" AND updatedAt BETWEEN ? AND ?) as todayDeactiveUser', [$startDate, $endDate])
+            ->selectRaw('SUM(status = "deleted" AND updatedAt BETWEEN ? AND ?) as todayDeletedUser', [$startDate, $endDate])
+            ->selectRaw('SUM(CASE WHEN (nominated_by_id = 1 OR nominated_by_id IS NULL) AND createdAt BETWEEN ? AND ? THEN 1 ELSE 0 END) AS todayNominatedby', [$startDate, $endDate])
+            ->first();
+
+            // echo "<pre>";
+            // print_r($userDataCount);
+            // exit();
+            return response()->json($userDataCount);
+    }
     /**
      * Show the form for creating a new resource.
      */

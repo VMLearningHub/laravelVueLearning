@@ -82,7 +82,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useForm } from '@inertiajs/vue3';
 import axios from 'axios';
-import { onMounted, onUnmounted, ref } from 'vue';
+import { onMounted, ref } from 'vue';
 
 const emit = defineEmits(['close-modal']);
 
@@ -117,21 +117,12 @@ const form = useForm({
     roles: [] as string[],
 });
 
-const handleEnterSubmit = (e: KeyboardEvent) => {
-    if (e.key === "Enter") {
-        e.preventDefault();
 
-        // Submit form
-        form.post('/admins', {
-            onSuccess: () => closeModal(),
-        });
-    }
-};
 
 
 // -------- Lifecycle --------
 onMounted(async () => {
-    window.addEventListener("keydown", handleEnterSubmit);
+
     // Pre-select admin roles
     if (props.admin.roles) {
         form.roles = props.admin.roles.map((r: Role) => r.name);
@@ -140,10 +131,6 @@ onMounted(async () => {
     // Fetch assignable roles
     const res = await axios.get<Role[]>("/admins/roles");
     AdminRoles.value = res.data;
-});
-
-onUnmounted(() => {
-    window.removeEventListener("keydown", handleEnterSubmit);
 });
 
 // -------- Methods --------

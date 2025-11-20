@@ -26,6 +26,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::prefix('users')->as('users.')->group(function () {
         Route::get('/', [UserController::class, 'index'])->name('index');
         Route::delete('/deactive/{id}', [UserController::class, 'destroy'])->name('destroy');
+        Route::post('/count-user-data', [UserController::class, 'countUserData'])->name('countUserData');
     });
 
     Route::prefix('admins')->as('admins.')->group(function () {

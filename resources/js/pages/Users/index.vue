@@ -3,6 +3,7 @@
     <Head title="Users" />
 
     <AppLayout :breadcrumbs="breadcrumbs">
+        <UserTabbing @tabs ="tabbing($event)"></UserTabbing>
         <div class=" h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
             <div class="flex mb-2 items-center justify-between flex-column md:flex-row flex-wrap">
                 <div class="flex flex-col space-y-1.5">
@@ -88,7 +89,7 @@
             </div>
             <div
                 class=" mt-2 p-2 relative min-h-[100vh] flex-1 rounded-xl border border-sidebar-border/70 md:min-h-min dark:border-sidebar-border">
-                <Paginate :dataval="users_lists" />
+                <Paginate :parameter = "Parameter" :dataval="users_lists" />
             </div>
         </div>
     </AppLayout>
@@ -129,6 +130,7 @@ import { EllipsisVertical } from 'lucide-vue-next';
 import Paginate from '@/components/custom/Paginate.vue';
 
 import { type BreadcrumbItem } from '@/types';
+import UserTabbing from './UserTabbing.vue';
 
 
 
@@ -146,7 +148,7 @@ interface User {
 }
 
 interface Props {
-    users_lists: User[]
+    users_lists: User
 }
 
 // --- Props ---
@@ -156,24 +158,33 @@ const { users_lists } = props
 // --- Reactive State ---
 const search = ref<string>((usePage().props.search as string) || '')
 const pageNumber = ref<number>(1)
+const tabvalue = ref<string>('total');
 
 // --- Breadcrumbs ---
 const breadcrumbs: BreadcrumbItem[] = [{ title: 'Users', href: '/users' }]
 
 
+const tabbing = (type: string) => {
+  tabvalue.value = type;
+};
 // --- Computed URL ---
 const filterUrl = computed(() => {
     const url = new URL('/users', window.location.origin)
     url.searchParams.set('page', pageNumber.value.toString())
+    url.searchParams.set('tabbing', tabvalue.value.toString())
     if (search.value) url.searchParams.set('search', search.value)
     return url.toString()
 })
+
+const Parameter = computed(() => ({
+    search: search.value,
+    tabbing: tabvalue.value,
+}));
 
 // --- Watchers ---
 watch(filterUrl, (updatedUrl) => {
     router.visit(updatedUrl, {
         preserveScroll: true,
-        preserveState: true,
         replace: true,
     })
 })

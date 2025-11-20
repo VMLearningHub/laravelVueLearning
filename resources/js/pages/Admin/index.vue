@@ -16,7 +16,7 @@
                         <Link href="/admins/create">Create</Link>
                     </Button> -->
 
-                    <Button type="button" variant="outline" @click="setShow({})">
+                    <Button type="button" variant="outline" @click="setShow">
                         <!-- <Link href="/admins/create">Create</Link> -->
                         Create
                     </Button>
@@ -88,7 +88,7 @@
                                             <DropdownMenuItem>
                                                 <span class="text-red-500 cursor-pointer"
                                                     @click="handleDeleteAdmin(admin.id)">
-                                                    Deactivate
+                                                    Delete
                                                 </span>
                                             </DropdownMenuItem>
                                         </DropdownMenuGroup>
@@ -106,8 +106,8 @@
 
 <script setup lang="ts">
 // Vue & Inertia imports
-import { computed, onMounted, ref, watch } from 'vue'
-import { Head, Link, router } from '@inertiajs/vue3'
+import { computed, ref, watch } from 'vue'
+import { Head, router } from '@inertiajs/vue3'
 
 // Layouts & Components
 import AppLayout from '@/layouts/AppLayout.vue'
@@ -138,8 +138,11 @@ import { Badge } from '@/components/ui/badge'
 import type { BreadcrumbItem } from '@/types'
 import CreateModel from './CreateModel.vue'
 
-const show = ref(false)
-const selectedAdmin = ref()
+// --- State ---
+const search = ref<string>('')
+const show = ref<boolean>(false)
+const selectedAdmin = ref<Admin | null>(null)
+// const type = ref<string>('')
 
 const setShow = (admin: Admin) => {
     if (!admin) {
@@ -170,8 +173,7 @@ defineProps<{
     admins: Admin[]
 }>()
 
-// --- State ---
-const search = ref<string>('')
+
 
 // --- Breadcrumbs ---
 const breadcrumbs: BreadcrumbItem[] = [
