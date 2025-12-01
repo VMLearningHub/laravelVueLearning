@@ -9,6 +9,7 @@ use App\Models\Report;
 use App\Models\User;
 use App\Models\UserActionNotes;
 use Carbon\Carbon;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -19,70 +20,85 @@ class UserController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request)
+    public function index()
+    {
+        return Inertia::render('Users/index');
+    }
+
+    public function userList(Request $request)
     {
         $input = $request->all();
         $status = $input['tabbing']??null;
         $search = $input['search']??null;
 
-        // echo "<pre>";
-        // print_r($input);
-        // exit();
+        try {
 
-        $users_lists = User::query()->select(
-            'users.id',
-            'users.profile_pic',
-            'users.first_name',
-            'users.last_name',
-            'users.username',
-            'users.phone_number',
-            'users.gender',
-            'users.dob',
-            'users.nominated_by',
-            'users.nominated_by_id',
-            'users.status',
-            'users.last_launch_time',
-            'users.createdAt',
-            'users.isHighlighted',
-            'users.profile_visibility',
-            'users.deactivated_by_type',
-            'users.deleted_by_id',
-            'users.user_level',
-        )->orderBy('id','desc');
-        if ($status == 'inside') {
-            $users_lists = $users_lists ->where('nominated_by_id', '!=', null)
-            ->whereNotIn('status', ['Deactivated', 'deleted'])->where('deletedAt', null);
-         }elseif($status == 'outside'){
-            $users_lists = $users_lists->where('nominated_by_id', null);
-         }elseif($status == 'deactivated'){
-            $users_lists = $users_lists->where('status', 'deactivated');
-         }elseif($status == 'deleted'){
-            $users_lists = $users_lists->where('status', 'deleted');
-         }elseif($status == 'highlighted'){
-            $users_lists = $users_lists ->where('nominated_by_id', '!=', null)
-            ->where('status', '!=', "Deactivated")
-            ->where('status', '!=', "deleted")
-            ->where('isHighlighted','1')
-            ->where('deletedAt', null);
-         }elseif($status == 'nominated_by_currently'){
-            $users_lists = $users_lists
-            ->withTrashed()
-            ->where(function ($q) {
-                $q->where('nominated_by_id', 1);
-                $q->OrwhereNull('nominated_by_id');
-            });
+
+            $users_lists = User::query()->select(
+                'users.id',
+                'users.profile_pic',
+                'users.first_name',
+                'users.last_name',
+                'users.username',
+                'users.phone_number',
+                'users.gender',
+                'users.dob',
+                'users.nominated_by',
+                'users.nominated_by_id',
+                'users.status',
+                'users.last_launch_time',
+                'users.createdAt',
+                'users.isHighlighted',
+                'users.profile_visibility',
+                'users.deactivated_by_type',
+                'users.deleted_by_id',
+                'users.user_level',
+            )->orderBy('id','desc');
+
+            if ($status == 'inside') {
+                $users_lists = $users_lists ->where('nominated_by_id', '!=', null)
+                ->whereNotIn('status', ['Deactivated', 'deleted'])->where('deletedAt', null);
+            }elseif($status == 'outside'){
+                $users_lists = $users_lists->where('nominated_by_id', null);
+            }elseif($status == 'deactivated'){
+                $users_lists = $users_lists->where('status', 'deactivated');
+            }elseif($status == 'deleted'){
+                $users_lists = $users_lists->where('status', 'deleted');
+            }elseif($status == 'highlighted'){
+                $users_lists = $users_lists ->where('nominated_by_id', '!=', null)
+                ->where('status', '!=', "Deactivated")
+                ->where('status', '!=', "deleted")
+                ->where('isHighlighted','1')
+                ->where('deletedAt', null);
+            }elseif($status == 'nominated_by_currently'){
+                $users_lists = $users_lists
+                ->withTrashed()
+                ->where(function ($q) {
+                    $q->where('nominated_by_id', 1);
+                    $q->OrwhereNull('nominated_by_id');
+                });
+            }else{
+                $users_lists = $users_lists ->where('nominated_by_id', '!=', null)->whereNotIn('status', ['Deactivated', 'deleted'])->where('deletedAt', null);
+            }
+
+            $this->applySearch($users_lists, $search );
+
+            $users_lists = $users_lists->paginate(30);
+            // echo "<pre>";
+            // print_r($users_lists->toArray());
+            // exit();
+            //  $users_lists = $users_lists->simplePaginate(30);
+
+            $arr = ['status'=>200, 'msg'=>'succes', 'data'=> $users_lists];
+        } catch (\Illuminate\Database\QueryException $ex) {
+            $msg = $ex->getMessage();
+            $arr = array("status" => 400, "msg" => $msg, "data" => null);
+        } catch (Exception $ex) {
+            $msg = $ex->getMessage();
+            $arr = array("status" => 400, "msg" => $msg, "data" => null);
         }
 
-        $this->applySearch($users_lists, $search );
-
-         $users_lists = $users_lists->paginate(30);
-        //  $users_lists = $users_lists->simplePaginate(30);
-
-        // echo "<pre>";
-        // print_r($users_lists->toArray());
-        // exit();
-
-        return Inertia::render('Users/index', compact('users_lists', 'search'));
+        return response()->json($arr, $arr['status']);
     }
 
     protected function applySearch($query, $search){
