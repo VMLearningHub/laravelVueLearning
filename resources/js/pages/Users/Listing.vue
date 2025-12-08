@@ -102,8 +102,14 @@ import { EllipsisVertical } from "lucide-vue-next";
 import Pagination from "./Pagination.vue";
 import { debounce } from "lodash-es";
 
+// -------- Props --------
+const props = defineProps<{
+    tabvalue: any;
+}>();
+
 // Search model
 const search = ref<string>((usePage().props.search as string) || "");
+
 
 // ------------ Types ------------
 interface UserList {
@@ -164,14 +170,15 @@ const pagination = ref<PaginationData>({
 
 
 let controller: AbortController | null = null;
-const fetchUsers = async (page = 1, keyword = search.value) => {
+const fetchUsers = async (page = 1, keyword = search.value, tabbingValue = props.tabvalue ) => {
+    // console.log('Fetching users with:', { page, keyword, tabbing });
 
     if (controller) controller.abort();
     controller = new AbortController();
     try {
         paginationShow.value = false
         const res = await axios.get<ApiPaginatedResponse<UserList>>(
-            `/users/user-list?page=${page}&search=${keyword}`
+            `/users/user-list?page=${page}&search=${keyword}&tabbing=${tabbingValue}`,
         );
 
         users_list.value = res.data.data
@@ -195,13 +202,15 @@ const fetchUsers = async (page = 1, keyword = search.value) => {
 };
 
 const debouncedFetch = debounce((value: string) => {
-    fetchUsers(1, value);
+    fetchUsers(1, value, props.tabvalue);
 }, 500); // wait 500ms after typing ends
 
 watch(search, (value) => {
     debouncedFetch(value);
 });
-
+watch(() => props.tabvalue, (newTabValue) => {
+    fetchUsers(1, search.value, newTabValue);
+});
 // ------------ API Fetch ------------
 onMounted(async () => {
     await fetchUsers();

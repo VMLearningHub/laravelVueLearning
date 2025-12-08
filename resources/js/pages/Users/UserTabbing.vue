@@ -87,6 +87,7 @@ const emit = defineEmits(['tabs']);
 
 const activeTab = ref<string>("total");
 
+
 const tabtype = (type: string) => {
     activeTab.value = type;
     emit('tabs', type);

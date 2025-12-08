@@ -9,7 +9,7 @@
 
         <div>
             <div class="h-full flex-1 flex-col gap-4 overflow-x-auto rounded-sm p-4">
-                <Listing> </Listing>
+                <Listing :tabvalue="tabvalue" />
             </div>
         </div>
 
@@ -35,8 +35,8 @@ const breadcrumbs: BreadcrumbItem[] = [{ title: 'Users', href: '/users' }];
 // const pageNumber = ref<number>(Number((usePage().props as any).page || 1) || 1);
 const tabvalue = ref<string>((usePage().props.tabbing as string) || 'total');
 
-const tabbing = (type: string) => {
-    tabvalue.value = type;
+    const tabbing = (type: string) => {
+        tabvalue.value = type;
 };
 
 </script>
