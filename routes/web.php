@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Laravel\Fortify\Features;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\MomentController;
 
 Route::get('/', function () {
     return Inertia::render('Welcome', [
@@ -28,6 +29,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/user-list', [UserController::class, 'userList'])->name('userList');
         Route::delete('/deactive/{id}', [UserController::class, 'destroy'])->name('destroy');
         Route::post('/count-user-data', [UserController::class, 'countUserData'])->name('countUserData');
+    });
+
+    Route::prefix('moments')->as('moments.')->group(function () {
+        Route::get('/', [MomentController::class, 'index'])->name('index');
+        Route::get('/watch-list', [MomentController::class, 'watchList'])->name('watchList');
+        Route::delete('/delete/{id}', [MomentController::class, 'delete'])->name('delete');
     });
 
     Route::prefix('admins')->as('admins.')->group(function () {

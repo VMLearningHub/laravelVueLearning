@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Moment extends Model
@@ -55,5 +56,21 @@ class Moment extends Model
         'raw_moderation_score',
         'moderation_updated_by_id'
     ];
+
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'userId', 'id')->select('id', 'profile_pic', 'first_name', 'last_name', 'username', 'phone_number','isHighlighted', 'total_activities_count','profile_visibility','nominated_by');
+    }
+
+    public function privatebyuser(): BelongsTo
+    {
+        return $this->belongsTo(Admin::class, 'private_by_admin', 'id');
+    }
+
+    public function highlightedbyuser(): BelongsTo
+    {
+        return $this->belongsTo(Admin::class, 'highlight_by_admin', 'id');
+    }
 
 }

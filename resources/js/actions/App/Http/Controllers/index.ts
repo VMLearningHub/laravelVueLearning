@@ -1,10 +1,12 @@
 import UserController from './UserController'
+import MomentController from './MomentController'
 import AdminController from './AdminController'
 import RoleController from './RoleController'
 import Settings from './Settings'
 
 const Controllers = {
     UserController: Object.assign(UserController, UserController),
+    MomentController: Object.assign(MomentController, MomentController),
     AdminController: Object.assign(AdminController, AdminController),
     RoleController: Object.assign(RoleController, RoleController),
     Settings: Object.assign(Settings, Settings),

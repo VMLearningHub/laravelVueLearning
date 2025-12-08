@@ -107,10 +107,6 @@ const props = defineProps<{
     tabvalue: any;
 }>();
 
-// Search model
-const search = ref<string>((usePage().props.search as string) || "");
-
-
 // ------------ Types ------------
 interface UserList {
     id: number;
@@ -142,16 +138,11 @@ interface ApiPaginatedResponse<T> {
     current_page: number;
     last_page: number;
 }
-
-// ------------ State ------------
-const users_list = ref<UserList[]>([]);
-const paginationShow = ref<boolean>(false)
-// const paginations = ref({
-//     links: [],
-//     current_page: 1,
-//     last_page: 10
-// });
-
+interface PaginationLink {
+    url: string | null
+    label: string
+    active: boolean
+}
 interface PaginationData {
   current_page: number
   last_page: number
@@ -159,6 +150,11 @@ interface PaginationData {
   total: number
   per_page: number
 }
+
+// ------------ State ------------
+const search = ref<string>((usePage().props.search as string) || "");
+const users_list = ref<UserList[]>([]);
+const paginationShow = ref<boolean>(false);
 
 const pagination = ref<PaginationData>({
   current_page: 1,
