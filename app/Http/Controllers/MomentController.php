@@ -2,10 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\MomentDelete;
 use App\Models\Moment;
+use App\Services\MomentService;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class MomentController extends Controller
@@ -59,6 +62,75 @@ class MomentController extends Controller
                     'msg' => 'success',
                     'data' => $moments_lists,
                 ];
+        } catch (\Illuminate\Database\QueryException $ex) {
+            $msg = $ex->getMessage();
+            $arr = array("status" => 400, "msg" => $msg, "data" => null);
+        } catch (Exception $ex) {
+            $msg = $ex->getMessage();
+            $arr = array("status" => 400, "msg" => $msg, "data" => null);
+        }
+        return response()->json($arr);
+    }
+
+
+    public function updateModerationScore(Request $request, MomentService $momentService){
+        $input = $request->all();
+        try {
+            $data = Moment::where('id', $input['id'])->firstOrFail();
+            // echo "<pre>";
+            // print_r($data->toArray());
+            // exit();
+            if ($data) {
+
+                if (
+                    $input['score'] >= 0
+                    && $input['score'] <= env('THRESHOLD_HIGHLIGHT', 20)
+                ) {
+
+                    if ($data['highlightStatus'] != "highlighted") {
+                        $momentService->highlightedMoment($input['id']);
+                    }
+                } else {
+                    if($data['updated_moderation_score'] > env('THRESHOLD_HIGHLIGHT', 20)){
+                        $data->highlightStatus = 'not_highlighted';
+                    }
+                }
+
+
+                $data->updated_moderation_score = $input['score'];
+                $data->moderation_updated_by_id = Auth::Id();
+                $data->save();
+                $msg = 'success';
+                $arr = ['status' => 200, "msg" => $msg, "data" => $input['id'], "updated_moderation_score" => $input['score']];
+            }else {
+                $msg = 'error';
+                $arr = ['status' => 400, "msg" => $msg, "data" => null];
+            }
+
+        } catch (\Illuminate\Database\QueryException $ex) {
+            $msg = $ex->getMessage();
+            $arr = array("status" => 400, "msg" => $msg, "data" => null);
+        } catch (Exception $ex) {
+            $msg = $ex->getMessage();
+            $arr = array("status" => 400, "msg" => $msg, "data" => null);
+        }
+        return response()->json($arr,$arr['status'] );
+    }
+
+    public function deleteMoment($id) {
+        try {
+            $input['authId'] = Auth::id();
+            $input['id'] = $id;
+            $input['deletedAt'] = Carbon::now()->format('Y-m-d H:i:s');
+
+            Moment::where('id', $id)->update([
+                'deleted_by_user_type' => "admin"
+            ]);
+
+            MomentDelete::dispatch($input);
+
+            $msg = 'success';
+            $arr = array("status" => 200, "msg" => $msg, "data" => null);
         } catch (\Illuminate\Database\QueryException $ex) {
             $msg = $ex->getMessage();
             $arr = array("status" => 400, "msg" => $msg, "data" => null);

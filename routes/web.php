@@ -29,12 +29,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/user-list', [UserController::class, 'userList'])->name('userList');
         Route::delete('/deactive/{id}', [UserController::class, 'destroy'])->name('destroy');
         Route::post('/count-user-data', [UserController::class, 'countUserData'])->name('countUserData');
+        Route::post('/suspend-user', [UserController::class, 'suspendUser'])->name('suspendUser');
     });
 
     Route::prefix('moments')->as('moments.')->group(function () {
         Route::get('/', [MomentController::class, 'index'])->name('index');
         Route::get('/watch-list', [MomentController::class, 'watchList'])->name('watchList');
-        Route::delete('/delete/{id}', [MomentController::class, 'delete'])->name('delete');
+        Route::delete('/delete/{id}', [MomentController::class, 'deleteMoment'])->name('delete');
+
+        Route::post('/update-moderation-score', [MomentController::class, 'updateModerationScore'])->name('updateModerationScore');
     });
 
     Route::prefix('admins')->as('admins.')->group(function () {

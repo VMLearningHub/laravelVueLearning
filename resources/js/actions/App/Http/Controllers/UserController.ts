@@ -1,7 +1,7 @@
 import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFormDefinition, applyUrlDefaults } from './../../../../wayfinder'
 /**
 * @see \App\Http\Controllers\UserController::index
-* @see app/Http/Controllers/UserController.php:23
+* @see app/Http/Controllers/UserController.php:24
 * @route '/users'
 */
 export const index = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -16,7 +16,7 @@ index.definition = {
 
 /**
 * @see \App\Http\Controllers\UserController::index
-* @see app/Http/Controllers/UserController.php:23
+* @see app/Http/Controllers/UserController.php:24
 * @route '/users'
 */
 index.url = (options?: RouteQueryOptions) => {
@@ -25,7 +25,7 @@ index.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\UserController::index
-* @see app/Http/Controllers/UserController.php:23
+* @see app/Http/Controllers/UserController.php:24
 * @route '/users'
 */
 index.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -35,7 +35,7 @@ index.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
 
 /**
 * @see \App\Http\Controllers\UserController::index
-* @see app/Http/Controllers/UserController.php:23
+* @see app/Http/Controllers/UserController.php:24
 * @route '/users'
 */
 index.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -45,7 +45,7 @@ index.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 
 /**
 * @see \App\Http\Controllers\UserController::index
-* @see app/Http/Controllers/UserController.php:23
+* @see app/Http/Controllers/UserController.php:24
 * @route '/users'
 */
 const indexForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -55,7 +55,7 @@ const indexForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => (
 
 /**
 * @see \App\Http\Controllers\UserController::index
-* @see app/Http/Controllers/UserController.php:23
+* @see app/Http/Controllers/UserController.php:24
 * @route '/users'
 */
 indexForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -65,7 +65,7 @@ indexForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
 
 /**
 * @see \App\Http\Controllers\UserController::index
-* @see app/Http/Controllers/UserController.php:23
+* @see app/Http/Controllers/UserController.php:24
 * @route '/users'
 */
 indexForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -82,7 +82,7 @@ index.form = indexForm
 
 /**
 * @see \App\Http\Controllers\UserController::userList
-* @see app/Http/Controllers/UserController.php:28
+* @see app/Http/Controllers/UserController.php:29
 * @route '/users/user-list'
 */
 export const userList = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -97,7 +97,7 @@ userList.definition = {
 
 /**
 * @see \App\Http\Controllers\UserController::userList
-* @see app/Http/Controllers/UserController.php:28
+* @see app/Http/Controllers/UserController.php:29
 * @route '/users/user-list'
 */
 userList.url = (options?: RouteQueryOptions) => {
@@ -106,7 +106,7 @@ userList.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\UserController::userList
-* @see app/Http/Controllers/UserController.php:28
+* @see app/Http/Controllers/UserController.php:29
 * @route '/users/user-list'
 */
 userList.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -116,7 +116,7 @@ userList.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
 
 /**
 * @see \App\Http\Controllers\UserController::userList
-* @see app/Http/Controllers/UserController.php:28
+* @see app/Http/Controllers/UserController.php:29
 * @route '/users/user-list'
 */
 userList.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -126,7 +126,7 @@ userList.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 
 /**
 * @see \App\Http\Controllers\UserController::userList
-* @see app/Http/Controllers/UserController.php:28
+* @see app/Http/Controllers/UserController.php:29
 * @route '/users/user-list'
 */
 const userListForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -136,7 +136,7 @@ const userListForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> =
 
 /**
 * @see \App\Http\Controllers\UserController::userList
-* @see app/Http/Controllers/UserController.php:28
+* @see app/Http/Controllers/UserController.php:29
 * @route '/users/user-list'
 */
 userListForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -146,7 +146,7 @@ userListForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => 
 
 /**
 * @see \App\Http\Controllers\UserController::userList
-* @see app/Http/Controllers/UserController.php:28
+* @see app/Http/Controllers/UserController.php:29
 * @route '/users/user-list'
 */
 userListForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -163,7 +163,7 @@ userList.form = userListForm
 
 /**
 * @see \App\Http\Controllers\UserController::destroy
-* @see app/Http/Controllers/UserController.php:188
+* @see app/Http/Controllers/UserController.php:189
 * @route '/users/deactive/{id}'
 */
 export const destroy = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'delete'> => ({
@@ -178,7 +178,7 @@ destroy.definition = {
 
 /**
 * @see \App\Http\Controllers\UserController::destroy
-* @see app/Http/Controllers/UserController.php:188
+* @see app/Http/Controllers/UserController.php:189
 * @route '/users/deactive/{id}'
 */
 destroy.url = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions) => {
@@ -205,7 +205,7 @@ destroy.url = (args: { id: string | number } | [id: string | number ] | string |
 
 /**
 * @see \App\Http\Controllers\UserController::destroy
-* @see app/Http/Controllers/UserController.php:188
+* @see app/Http/Controllers/UserController.php:189
 * @route '/users/deactive/{id}'
 */
 destroy.delete = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'delete'> => ({
@@ -215,7 +215,7 @@ destroy.delete = (args: { id: string | number } | [id: string | number ] | strin
 
 /**
 * @see \App\Http\Controllers\UserController::destroy
-* @see app/Http/Controllers/UserController.php:188
+* @see app/Http/Controllers/UserController.php:189
 * @route '/users/deactive/{id}'
 */
 const destroyForm = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -230,7 +230,7 @@ const destroyForm = (args: { id: string | number } | [id: string | number ] | st
 
 /**
 * @see \App\Http\Controllers\UserController::destroy
-* @see app/Http/Controllers/UserController.php:188
+* @see app/Http/Controllers/UserController.php:189
 * @route '/users/deactive/{id}'
 */
 destroyForm.delete = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -247,7 +247,7 @@ destroy.form = destroyForm
 
 /**
 * @see \App\Http\Controllers\UserController::countUserData
-* @see app/Http/Controllers/UserController.php:116
+* @see app/Http/Controllers/UserController.php:117
 * @route '/users/count-user-data'
 */
 export const countUserData = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -262,7 +262,7 @@ countUserData.definition = {
 
 /**
 * @see \App\Http\Controllers\UserController::countUserData
-* @see app/Http/Controllers/UserController.php:116
+* @see app/Http/Controllers/UserController.php:117
 * @route '/users/count-user-data'
 */
 countUserData.url = (options?: RouteQueryOptions) => {
@@ -271,7 +271,7 @@ countUserData.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\UserController::countUserData
-* @see app/Http/Controllers/UserController.php:116
+* @see app/Http/Controllers/UserController.php:117
 * @route '/users/count-user-data'
 */
 countUserData.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -281,7 +281,7 @@ countUserData.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => (
 
 /**
 * @see \App\Http\Controllers\UserController::countUserData
-* @see app/Http/Controllers/UserController.php:116
+* @see app/Http/Controllers/UserController.php:117
 * @route '/users/count-user-data'
 */
 const countUserDataForm = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -291,7 +291,7 @@ const countUserDataForm = (options?: RouteQueryOptions): RouteFormDefinition<'po
 
 /**
 * @see \App\Http\Controllers\UserController::countUserData
-* @see app/Http/Controllers/UserController.php:116
+* @see app/Http/Controllers/UserController.php:117
 * @route '/users/count-user-data'
 */
 countUserDataForm.post = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -301,6 +301,62 @@ countUserDataForm.post = (options?: RouteQueryOptions): RouteFormDefinition<'pos
 
 countUserData.form = countUserDataForm
 
-const UserController = { index, userList, destroy, countUserData }
+/**
+* @see \App\Http\Controllers\UserController::suspendUser
+* @see app/Http/Controllers/UserController.php:230
+* @route '/users/suspend-user'
+*/
+export const suspendUser = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
+    url: suspendUser.url(options),
+    method: 'post',
+})
+
+suspendUser.definition = {
+    methods: ["post"],
+    url: '/users/suspend-user',
+} satisfies RouteDefinition<["post"]>
+
+/**
+* @see \App\Http\Controllers\UserController::suspendUser
+* @see app/Http/Controllers/UserController.php:230
+* @route '/users/suspend-user'
+*/
+suspendUser.url = (options?: RouteQueryOptions) => {
+    return suspendUser.definition.url + queryParams(options)
+}
+
+/**
+* @see \App\Http\Controllers\UserController::suspendUser
+* @see app/Http/Controllers/UserController.php:230
+* @route '/users/suspend-user'
+*/
+suspendUser.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
+    url: suspendUser.url(options),
+    method: 'post',
+})
+
+/**
+* @see \App\Http\Controllers\UserController::suspendUser
+* @see app/Http/Controllers/UserController.php:230
+* @route '/users/suspend-user'
+*/
+const suspendUserForm = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+    action: suspendUser.url(options),
+    method: 'post',
+})
+
+/**
+* @see \App\Http\Controllers\UserController::suspendUser
+* @see app/Http/Controllers/UserController.php:230
+* @route '/users/suspend-user'
+*/
+suspendUserForm.post = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+    action: suspendUser.url(options),
+    method: 'post',
+})
+
+suspendUser.form = suspendUserForm
+
+const UserController = { index, userList, destroy, countUserData, suspendUser }
 
 export default UserController

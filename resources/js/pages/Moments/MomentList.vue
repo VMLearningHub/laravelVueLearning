@@ -10,16 +10,36 @@
                     </span>
 
                     <div class="space-x-2">
-                        <button class="text-xs bg-yellow-400 px-2 py-1 rounded">Suspend</button>
-                        <button class="text-xs bg-red-600 text-white px-2 py-1 rounded">Delete</button>
+                        <button class="text-xs bg-yellow-400 px-2 py-1 rounded" @click="suspendUser(moment.id)">Suspend</button>
+                        <button class="text-xs bg-red-600 text-white px-2 py-1 rounded" @click="deleteMoment(moment.userId)">Delete</button>
                     </div>
                 </div>
 
-                <!-- Counter -->
+                <!-- Counter Section -->
                 <div class="flex items-center justify-center gap-2 py-3 border-b">
-                    <button class="bg-gray-200 w-7 h-7 rounded-full text-lg leading-none">-</button>
-                    <span class="font-semibold text-lg">96</span>
-                    <button class="bg-gray-200 w-7 h-7 rounded-full text-lg leading-none">+</button>
+                    <div v-if="moment.moderation_score !== null">
+
+                        <!-- Decrease -->
+                        <button @click="updateScore(moment.id, -5)"
+                            class="cursor-pointer bg-gray-200 w-7 h-7 rounded-full text-lg leading-none">
+                            -
+                        </button>
+
+                        <!-- Display -->
+                        <span class="font-semibold text-lg">
+                            {{ Number(moment.updated_moderation_score??moment.moderation_score).toFixed(2) }}
+                        </span>
+
+                        <!-- Increase -->
+                        <button @click="updateScore(moment.id, 5)"
+                            class="cursor-pointer bg-gray-200 w-7 h-7 rounded-full text-lg leading-none">
+                            +
+                        </button>
+                    </div>
+
+                    <div v-else>
+                        <span class="font-semibold text-lg">Moment</span>
+                    </div>
                 </div>
 
                 <!-- IMAGE -->
@@ -55,7 +75,6 @@
 
 <script setup lang="ts">
 import axios from "axios";
-import { log } from "node:console";
 import { onMounted, onUnmounted, ref } from "vue";
 
 const formatDate = (dateStr: string) => {
@@ -69,11 +88,14 @@ const formatDate = (dateStr: string) => {
 // ---- Types ----
 interface MomentList {
     id: number;
+    userId: number;
     media_type: string;
     media_back: string;
     video_thumbnail: string;
     createdAt: string;
     category: string;
+    moderation_score: number;
+    updated_moderation_score: number;
     subcategory: string;
     user: {
         profile_pic: string;
@@ -113,6 +135,69 @@ const pagination = ref({
 
 let controller: AbortController | null = null;
 
+// Update Score Function
+const updateScore = (id: number, value: number) => {
+    const index = moments_list.value.findIndex(m => m.id === id);
+    if (index !== -1) {
+
+        if (moments_list.value[index].updated_moderation_score) {
+            if (moments_list.value[index].updated_moderation_score + value >=100) {
+                moments_list.value[index].updated_moderation_score = 100
+            }else if(moments_list.value[index].updated_moderation_score + value <=0){
+                moments_list.value[index].updated_moderation_score = 0
+            } else {
+                moments_list.value[index].updated_moderation_score += value;
+            }
+        }else {
+            if (moments_list.value[index].moderation_score + value >=100) {
+                moments_list.value[index].moderation_score = 100
+                moments_list.value[index].updated_moderation_score = 100
+            }else if(moments_list.value[index].moderation_score + value <=0){
+                moments_list.value[index].moderation_score = 0
+                moments_list.value[index].updated_moderation_score = 0
+            } else {
+                moments_list.value[index].moderation_score += value;
+                moments_list.value[index].updated_moderation_score += value;
+            }
+
+        }
+        // Optional: You can call API to update backend
+        axios.post(`/moments/update-moderation-score`, { id, score: moments_list.value[index].updated_moderation_score })
+            .catch(() => console.error("Failed to update score"));
+    }
+
+};
+
+const suspendUser = async (id: number) => {
+    if (!confirm("Are you sure you want to suspend this user?")) return;
+
+    try {
+        await axios.post(`/users/suspend-user`, {id:id})
+            .catch(() => console.error("Failed to suspend user"));
+
+        // Remove moment from list UI instantly
+        moments_list.value = moments_list.value.filter(m => m.id !== id);
+
+    } catch (err) {
+        console.error("Failed to suspend user", err);
+        alert("suspend failed. Try again.");
+    }
+};
+const deleteMoment = async (id: number) => {
+    if (!confirm("Are you sure you want to delete this moment?")) return;
+
+    try {
+        await axios.delete(`/moments/delete/${id}`);
+
+        // Remove moment from list UI instantly
+        moments_list.value = moments_list.value.filter(m => m.id !== id);
+
+    } catch (err) {
+        console.error("Failed to delete moment", err);
+        alert("Delete failed. Try again.");
+    }
+};
+
 const fetchMoments = async (page = 1) => {
     if (isLoading.value) return;
     isLoading.value = true;
@@ -146,16 +231,13 @@ const fetchMoments = async (page = 1) => {
 };
 
 const loadMoreMoments = () => {
-    console.log(pagination.value.current_page);
-
-
     if (pagination.value.current_page >= pagination.value.last_page) return;
     fetchMoments(pagination.value.current_page + 1);
 };
 
 // ---- Infinite Scroll Event ----
 const handleScroll = () => {
-    if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 20) {
+    if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 1000) {
         loadMoreMoments();
     }
 };
@@ -169,4 +251,3 @@ onUnmounted(() => {
     window.removeEventListener("scroll", handleScroll);
 });
 </script>
-

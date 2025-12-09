@@ -6,6 +6,7 @@ use App\Models\Moment;
 use App\Models\Order;
 use App\Models\PntfToken;
 use App\Models\Report;
+use App\Models\SuspensionUser;
 use App\Models\User;
 use App\Models\UserActionNotes;
 use Carbon\Carbon;
@@ -222,6 +223,33 @@ class UserController extends Controller
 
             return redirect()->route('users.index')->with('message', 'user deactived successfilly');
 
+
+    }
+
+
+    public function suspendUser(Request $request) {
+        $input = $request->all();
+        try {
+            $data = new SuspensionUser();
+            $data->user_id = $input['id'];
+            $data->suspended_by = Auth::id();
+            $data->duration = 4;
+            $data->type =  'other';
+            $data->message = $input['message']??'Your account is suspended due to Currently Guideline Violation.';
+            $data->save();
+
+            $msg ='Success';
+            $arr = ['status' => 200, "msg" => $msg, "data" => $data];
+
+        } catch (\Illuminate\Database\QueryException $ex) {
+            $msg = $ex->getMessage();
+            $arr = array("status" => 400, "msg" => $msg, "result" => array());
+        } catch (Exception $ex) {
+            $msg = $ex->getMessage();
+            $arr = array("status" => 400, "msg" => $msg, "result" => array());
+        }
+
+        return response()->json($arr);
 
     }
 }
